@@ -1,19 +1,16 @@
-import random
-
 import numpy as np
-import torch
 
 
 class EpsilonGreedy:
-    def __init__(self, epsilon=0.1, num_actions=3):
+    def __init__(self, epsilon=0.1, num_actions=3, seed=42):
         self.epsilon = epsilon
-        self.num_actions = num_actions
+        self.actions = range(num_actions)
+        np.random.seed(seed)
 
-    def select(self, state, policy_net):
-        if random.random() > self.epsilon:
-            with torch.no_grad():
-                return policy_net(state).argmax(1).unsqueeze(0).detach()
-        return torch.tensor([[random.randrange(self.num_actions)]], dtype=torch.long)
+    def select_action(self, state, qTable):
+        if np.random.rand() > self.epsilon:
+            return np.argmax(qTable[state])
+        return np.random.choice(self.actions)
 
 
 class DecreasingEpsilon:
@@ -27,8 +24,8 @@ class DecreasingEpsilon:
     def reset(self):
         self.epsGreedy = EpsilonGreedy(self.start_epsilon, self.num_actions)
 
-    def select(self, state, policy_net, steps):
-        res = self.epsGreedy.select(state, policy_net)
+    def select_action(self, state, qTable, steps):
+        res = self.epsGreedy.select_action(state, qTable)
         self.epsGreedy.epsilon = (self.start_epsilon - self.stop_epsilon) * np.exp(
-            -1 * steps / self.decay_rate) + self.stop_epsilon
+                -1 * steps / self.decay_rate) + self.stop_epsilon
         return res

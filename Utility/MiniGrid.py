@@ -1,3 +1,5 @@
+import hashlib
+
 import gymnasium as gym
 import numpy as np
 import torch
@@ -9,7 +11,7 @@ class MiniGridBase():
         self.env = gym.make(env_name, render_mode=render_mode if render_mode is not None else None)
         self.numRow = self.env.unwrapped.height - 1
         self.numCol = self.env.unwrapped.width - 1
-        self.numStates = self.numCol * self.numRow
+        self.numStates = self.numCol * self.numRow * 4
         self.maxSteps = self.env.unwrapped.max_steps
         self.numActions = 3
 
@@ -58,23 +60,39 @@ class MiniGridID(MiniGridBase):
 
     def __init__(self, env_name="MiniGrid-Empty-8x8-v0", render_mode=None):
         super().__init__(env_name, render_mode)
+        self.numRow = self.env.unwrapped.height - 2
+        self.numCol = self.env.unwrapped.width - 2
+        self.numStates = self.numCol * self.numRow * 4
 
     def reset(self):
         _ = self.env.reset()
         return self.__get_state_id()
-
     def step(self, action):
         obs, reward, done, truncated, info = self.env.step(action)
-        if done:
-            obs = None
-        else:
-            obs = self.__get_state_id()
-        return self.env.unwrapped.agent_pos, reward, done, truncated
+        obs = self.__get_state_id()
+        return obs, reward, done, truncated
 
     def __get_state_id(self):
         row, col = self.env.unwrapped.agent_pos
-        cell_id = (row - 1) + (col - 1) * self.numCol
-        return cell_id
+        return ((row - 1) * self.numRow + (col - 1))*(self.env.unwrapped.agent_dir+1)
+
+
+class MiniGridHash(MiniGridBase):
+    def __init__(self, env_name="MiniGrid-Empty-8x8-v0", render_mode=None):
+        super().__init__(env_name, render_mode)
+        self.env = ImgObsWrapper(self.env)
+
+    def reset(self):
+        obs, _ = self.env.reset()
+        return self.__hash(obs)
+
+    def step(self, action):
+        obs, reward, done, truncated, info = self.env.step(action)
+        return self.__hash(obs), reward, done, truncated
+
+    def __hash(self, obs):
+        state_str = str(obs.flatten())
+        return hashlib.md5(state_str.encode()).hexdigest()
 
 
 class MiniGridOneHot(MiniGridBase):
