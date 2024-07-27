@@ -10,7 +10,7 @@ class EpsilonGreedy:
         self.epsilon = epsilon
         self.num_actions = num_actions
 
-    def select(self, state, policy_net):
+    def select_action(self, state, policy_net):
         if random.random() > self.epsilon:
             with torch.no_grad():
                 return policy_net(state).argmax(1).unsqueeze(0).detach()
@@ -28,8 +28,8 @@ class DecreasingEpsilon:
     def reset(self):
         self.epsGreedy = EpsilonGreedy(self.start_epsilon, self.num_actions)
 
-    def select(self, state, policy_net, steps):
-        res = self.epsGreedy.select(state, policy_net)
+    def select_action(self, state, policy_net, steps):
+        res = self.epsGreedy.select_action(state, policy_net)
         self.epsGreedy.epsilon = (self.start_epsilon - self.stop_epsilon) * np.exp(
             -1 * steps / self.decay_rate) + self.stop_epsilon
         return res

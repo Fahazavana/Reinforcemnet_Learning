@@ -25,7 +25,6 @@ class QLearning:
             for step in range(self.env.maxSteps):
                 action = strategy.select_action(current_state, self.q_table, steps_done)
                 next_state, reward, done, truncated = self.env.step(action)
-                dir = dir.union({env.env.unwrapped.agent_dir})
                 steps_done += 1
                 if next_state not in self.q_table:
                     self.q_table[next_state] = np.ones(self.env.numActions)

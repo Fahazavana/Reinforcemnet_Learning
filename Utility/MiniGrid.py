@@ -11,7 +11,7 @@ class MiniGridBase():
         self.env = gym.make(env_name, render_mode=render_mode if render_mode is not None else None)
         self.numRow = self.env.unwrapped.height - 1
         self.numCol = self.env.unwrapped.width - 1
-        self.numStates = self.numCol * self.numRow * 4
+        self.numStates = self.numCol * self.numRow
         self.maxSteps = self.env.unwrapped.max_steps
         self.numActions = 3
 
@@ -60,9 +60,9 @@ class MiniGridID(MiniGridBase):
 
     def __init__(self, env_name="MiniGrid-Empty-8x8-v0", render_mode=None):
         super().__init__(env_name, render_mode)
-        self.numRow = self.env.unwrapped.height - 2
-        self.numCol = self.env.unwrapped.width - 2
-        self.numStates = self.numCol * self.numRow * 4
+        self.numRow = self.env.unwrapped.height - 1
+        self.numCol = self.env.unwrapped.width - 1
+        self.numStates = self.numCol * self.numRow
 
     def reset(self):
         _ = self.env.reset()
@@ -74,7 +74,7 @@ class MiniGridID(MiniGridBase):
 
     def __get_state_id(self):
         row, col = self.env.unwrapped.agent_pos
-        return ((row - 1) * self.numRow + (col - 1))*(self.env.unwrapped.agent_dir+1)
+        return (row - 1) * self.numRow + (col - 1)
 
 
 class MiniGridHash(MiniGridBase):
@@ -126,7 +126,7 @@ class MiniGridRaw(MiniGridBase):
 
     def __init__(self, env_name="MiniGrid-Empty-8x8-v0", render_mode=None):
         super().__init__(env_name, render_mode)
-        self.env = ImgObsWrapper(super().env)
+        self.env = ImgObsWrapper(self.env)
 
     def __extractObjectInformation_(self, observation):
         (rows, cols, x) = observation.shape
@@ -170,7 +170,7 @@ class MiniGridImage(MiniGridBase):
 
     def __init__(self, render_mode=None):
         super().__init__(env_name='MiniGrid-Empty-8x8-v0', render_mode=render_mode)
-        self.env = RGBImgPartialObsWrapper(ImgObsWrapper(super().env))
+        self.env = RGBImgPartialObsWrapper(ImgObsWrapper(self.env))
         self.screen_height, self.screen_width = 56, 56
 
     def __tograyscale(self, frame):
