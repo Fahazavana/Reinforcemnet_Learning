@@ -144,6 +144,7 @@ class MiniGridDQN():
                     break
                 current_stack = next_stack
             live_plots.e.append(strategy.epsGreedy.epsilon)
+            live_plots.s.append(self.env.step_count())
             live_plots.l.append(loss)
             live_plots.r.append(reward.item())
             if episode % 5 == 0:
@@ -159,8 +160,8 @@ class MiniGridDQN():
         print(f"Average Reward : {sum(logs.rewards) / episodes:.3f}")
         print(f"Average steps  : {sum(logs.steps_taken) / episodes:.3f}")
         date_time = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-        logs.save_log(f"DQNIMAGE_TRAIN_{date_time}.json")
-        live_plots.save_and_close(f"DQNIMAGE_LIVE_PLOT_{date_time}.json")
+        logs.save_log(f"DQNIMAGE_train.json")
+        live_plots.save_and_close(f"DQNIMAGE_live_plot.json")
 
 
 def eval(env, policy_net, strategy, episodes):
@@ -207,7 +208,7 @@ if __name__ == '__main__':
                                      stop_epsilon=0.01,
                                      decay_rate=1e4)
 
-        minigrid_dqn.train(batch_size=128, strategy=strategy, episodes=2000, sync_freq=2048)
+        minigrid_dqn.train(batch_size=128, strategy=strategy, episodes=1500, sync_freq=2048)
         torch.save(minigrid_dqn.policy_net.state_dict(), 'dqn_image.pth')
     else:
         policy_net = CNN_DQN(56, 56, 3).to(device)

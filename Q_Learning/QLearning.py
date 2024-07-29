@@ -54,6 +54,7 @@ class QLearning:
                     break
                 current_state = next_state
             live_plots.e.append(strategy.epsGreedy.epsilon)
+            live_plots.s.append(self.env.step_count())
             live_plots.l.append(td_error ** 2)
             live_plots.r.append(reward)
             if episode % 5 == 0:
@@ -68,13 +69,12 @@ class QLearning:
         print(f"Completion rate: {logs.finish_counter / episodes}")
         print(f"Average Reward : {sum(logs.rewards) / episodes:.3f}")
         print(f"Average steps  : {sum(logs.steps_taken) / episodes:.3f}")
-        date_time = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-        logs.save_log(f"QLEARNING_TRAIN_{date_time}.json")
-        live_plots.save_and_close(f"Q_LEARNING_LIVE_PLOT_{date_time}.json")
+        logs.save_log(f"QLearning_train.json")
+        live_plots.save_and_close(f"QLearning_live_plot.json")
 
 
 def eval(env, q_table, strategy, episodes):
-    print("\n\nEvaluation...")
+    print("Evaluation...")
     steps_list, rewards_list = [], []
     finish_counter = 0
     for episode in range(1, episodes + 1):
@@ -106,15 +106,16 @@ def main(env, alpha, gamma, strategy, episodes):
 if __name__ == '__main__':
     env = MiniGridHash()
     # Check if there is already a saved table
-    if os.path.exists("q_learning_table.pkll"):
+    if os.path.exists("q_learning_table.pkl"):
         with open('q_learning_table.pkl', 'rb') as f:
             q_table = pickle.load(f)
     else:
         # Train and save
         strategy = DecreasingEpsilon(1, 0.01, 3000)
         q_table = main(env, 0.1, 0.9, strategy, 512)
-        # with open('q_learning_table.pkl', 'wb') as f:
-        #     pickle.dump(q_table, f)
+        with open('q_learning_table.pkl', 'wb') as f:
+            pickle.dump(q_table, f)
 
     # Evaluation
+
     eval(env, q_table, EpsilonGreedy(0, 3), 1000)

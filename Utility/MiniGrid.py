@@ -24,7 +24,7 @@ class MiniGridBase():
         self.numActions = 3
 
     def render(self):
-        self.env.render()
+        return self.env.render()
 
     def close(self):
         self.env.close()

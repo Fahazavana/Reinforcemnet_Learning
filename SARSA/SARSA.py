@@ -53,6 +53,7 @@ class SARSA:
                 current_state = next_state
                 current_action = next_action
             live_plots.e.append(strategy.epsGreedy.epsilon)
+            live_plots.s.append(self.env.step_count())
             live_plots.l.append(td_error ** 2)
             live_plots.r.append(reward)
             if episode % 5 == 0:
@@ -67,9 +68,8 @@ class SARSA:
         print(f"Completion rate: {logs.finish_counter / episodes}")
         print(f"Average Reward : {sum(logs.rewards) / episodes:.3f}")
         print(f"Average steps  : {sum(logs.steps_taken) / episodes:.3f}")
-        date_time = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-        logs.save_log(f"SARSA_TRAIN_{date_time}.json")
-        live_plots.save_and_close(f"SARSA_LIVE_PLOT_{date_time}.json")
+        logs.save_log(f"SARSA_train.json")
+        live_plots.save_and_close(f"SARSA_live_plot.json")
 
 
 def eval(env, q_table, strategy, episodes):

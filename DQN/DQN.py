@@ -104,6 +104,7 @@ class MiniGridDQN():
                     break
                 current_state = next_state
             live_plots.e.append(strategy.epsGreedy.epsilon)
+            live_plots.s.append(self.env.step_count())
             live_plots.l.append(loss)
             live_plots.r.append(reward.item())
             if episode % 5 == 0:
@@ -118,9 +119,8 @@ class MiniGridDQN():
         print(f"Completion rate: {logs.finish_counter / episodes}")
         print(f"Average Reward : {sum(logs.rewards) / episodes:.3f}")
         print(f"Average steps  : {sum(logs.steps_taken) / episodes:.3f}")
-        date_time = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-        logs.save_log(f"DQN_TRAIN_{date_time}.json")
-        live_plots.save_and_close(f"DQN_LIVE_PLOT_{date_time}.json")
+        logs.save_log(f"DQN_train.json")
+        live_plots.save_and_close(f"DQN_live_plot.json")
 
 
 def eval(env, policy_net, strategy, episodes):
