@@ -1,8 +1,8 @@
 import os
 import pickle
-
+from datetime import datetime
 import numpy as np
-
+from Utility.Plots import LivePlots, Logs
 from Utility.MiniGrid import MiniGridHash
 from Utility.TabularEpsilonStrategy import DecreasingEpsilon, EpsilonGreedy
 
@@ -13,11 +13,12 @@ class SARSA:
         self.q_table = {}
 
     def train(self, gamma, alpha, strategy: DecreasingEpsilon, episodes):
-        print("Start training")
-        dir = set()
-        steps_list, rewards_list, epsilons = [], [], []
+        start_time = datetime.now()
+        print(f"Training started: {start_time.strftime('%H:%M:%S')}")
+
+        logs = Logs()
+        live_plots = LivePlots()
         steps_done = 0
-        finish_counter = 0
         for episode in range(1, episodes + 1):
             current_state = self.env.reset()
             if current_state not in self.q_table:
@@ -26,7 +27,6 @@ class SARSA:
             for step in range(self.env.maxSteps):
                 next_state, reward, done, truncated = self.env.step(current_action)
                 steps_done += 1
-
                 if next_state not in self.q_table:
                     self.q_table[next_state] = np.ones(self.env.numActions)
                 if done:
@@ -40,25 +40,36 @@ class SARSA:
                 self.q_table[current_state][current_action] += alpha * td_error
 
                 if done or truncated:
-                    steps_list.append(self.env.step_count())
-                    epsilons.append(strategy.epsGreedy.epsilon)
-                    rewards_list.append(reward)
+                    logs.steps_done.append(steps_done)
+                    logs.steps_taken.append(self.env.step_count())
+                    logs.td_error_sq.append(td_error**2)
+                    logs.rewards.append(reward)
                     if done:
-                        finish_counter += 1
+                        logs.finish_counter +=1
                         print(f"Episode {episode} completed, Use {self.env.step_count()} steps, and received {reward} reward.")
                     if truncated:
                         print(f"Episode {episode} truncated after {self.env.step_count()} steps, and received {reward}")
                     break
                 current_state = next_state
                 current_action = next_action
+            live_plots.e.append(strategy.epsGreedy.epsilon)
+            live_plots.l.append(td_error ** 2)
+            live_plots.r.append(reward)
+            if episode % 5 == 0:
+                live_plots.update_plot()
+        live_plots.update_plot()
 
-        print("Finished training")
-        print(f"Direction {dir}")
+        end_time = datetime.now()
+        print(f"Training ended: {end_time.strftime('%H:%M:%S')}")
+        delta = datetime(1,1,1) + (end_time - start_time)
+        print(f"Training took {delta.strftime('%H:%M:%S')}")
         print('\n====== TRAIN SUMMARY ======')
-        print(f"Completion rate: {finish_counter / episodes}")
-        print(f"Average Reward : {sum(rewards_list) / episodes:.3f}")
-        print(f"Average steps  : {sum(steps_list) / episodes:.3f}")
-        return steps_list, rewards_list, epsilons
+        print(f"Completion rate: {logs.finish_counter / episodes}")
+        print(f"Average Reward : {sum(logs.rewards) / episodes:.3f}")
+        print(f"Average steps  : {sum(logs.steps_taken) / episodes:.3f}")
+        date_time = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        logs.save_log(f"SARSA_TRAIN_{date_time}.json")
+        live_plots.save_and_close(f"SARSA_LIVE_PLOT_{date_time}.json")
 
 
 def eval(env, q_table, strategy, episodes):
@@ -87,20 +98,20 @@ def eval(env, q_table, strategy, episodes):
 
 def main(env, alpha, gamma, strategy, episodes):
     q_table = SARSA(env)
-    steps, reward, epsilons = q_table.train(gamma, alpha, strategy, episodes)
+    q_table.train(gamma, alpha, strategy, episodes)
     return q_table.q_table
 
 
 if __name__ == '__main__':
     env = MiniGridHash()
     # Check if there is already a saved table
-    if os.path.exists("sarsa_learning_table.pkl"):
+    if os.path.exists("sarsa_learning_table.pkll"):
         with open('sarsa_learning_table.pkl', 'rb') as f:
             q_table = pickle.load(f)
     else:
         # Train and save
         strategy = DecreasingEpsilon(1, 0.01, 3000)
-        q_table = main(env, 0.1, 0.9, strategy, 1000)
+        q_table = main(env, 0.1, 0.9, strategy, 600)
         with open('sarsa_learning_table.pkl', 'wb') as f:
             pickle.dump(q_table, f)
 

@@ -1,17 +1,9 @@
 import hashlib
-import platform
 
 import gymnasium as gym
 import numpy as np
 import torch
 from minigrid.wrappers import ImgObsWrapper, RGBImgPartialObsWrapper
-
-
-def get_device():
-    if platform.platform().lower().startswith("mac"):  # macOS
-        return "mps" if torch.backends.mps.is_available() else "cpu"
-    else:  # Linux, Windows
-        return "cuda" if torch.cuda.is_available() else "cpu"
 
 
 class MiniGridBase():
@@ -57,14 +49,14 @@ class MiniGridHash(MiniGridBase):
         return hashlib.md5(state_str.encode()).hexdigest()
 
 
-class MiniGridRaw(MiniGridBase):
+class MiniGridDQN(MiniGridBase):
     """
     This class use the provided base code for deep Q-net
     """
 
     def __init__(self, env_name="MiniGrid-Empty-8x8-v0", render_mode=None):
         super().__init__(env_name, render_mode)
-        self.env = ImgObsWrapper(self.env)
+        self.env = ImgObsWrapper(super().env)
 
     def __extractObjectInformation_(self, observation):
         (rows, cols, x) = observation.shape
@@ -108,7 +100,7 @@ class MiniGridImage(MiniGridBase):
 
     def __init__(self, render_mode=None):
         super().__init__(env_name='MiniGrid-Empty-8x8-v0', render_mode=render_mode)
-        self.env = ImgObsWrapper(RGBImgPartialObsWrapper(self.env))
+        self.env = RGBImgPartialObsWrapper(ImgObsWrapper(super().env))
         self.screen_height, self.screen_width = 56, 56
 
     def __tograyscale(self, frame):
