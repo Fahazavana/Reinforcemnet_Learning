@@ -17,14 +17,14 @@
 
 # How to
 ## Directories and scripts
-* Utilty: Utility class and function
+* Utility: Utility class and function
   * ``EpsilonStrategy`` and ``DQNEpsilonStrategy``: Helper class for $\epsilon$-Greedy and decresinag epsilon
-  * ``MiniGrid``: Helper class for each use case of the minigrid:
+  * ``MiniGrid``: Helper class for each use case of the mini-grid:
     * ``MiniGridBase``: Defaults
     * ``MiniGridHash``: The observation become the MD5 hash of the observation
-    * ``MiniGridRaw``: The observation become a normalized flattedend array
-    * ``MiniGridImage``: The observation is the normalized grayscale of the partila observation
-    * ``get_device``: a function that return ``mps``,  ``cuda`` or ``cpu`` depending on the plateform
+    * ``MiniGridRaw``: The observation becomes a normalized flattened array
+    * ``MiniGridImage``: The observation is the normalized grayscale of the partial observation
+    * ``get_device``: a function that return ``mps``,  ``cuda`` or ``cpu`` depending on the platform
   * ``ReplayMemory``: Contain the named Tuple ``Transition`` and a Class for the Replay Buffer
   * ``Plots``: Live training monitoring plots, and some helper function for the plots in ``Results.ipynb``
 * ``Q_Learning``: Folder for Q-Learning algorithms
@@ -35,23 +35,23 @@
   * ``sarsa_learning_table.pkl``: Optimal Q-table found using the SARSA-learning algorithm
 * ``DQN``: Folder for Deep Q-Network approach
   * ``DQN``: Main scripts/Module for simple Deep Q-Network
-  * ``dqn.pth``: Optimal weights of the policy netwok found using DQN
+  * ``dqn.pth``: Optimal weights of the policy network found using DQN
   * ``DQNIMAGE``: Main scripts/Module for CNN Deep Q-Network
   * ``dqn_image.pth``: Optimal weights of the policy netwok found using CNN-DQN
 
-All the ``*_live_plot,json`` files contains the reward, td-error (squared, mse), steps taken per episod, thes value were
-dynaicaly during training.
+All the ``*_live_plot.json`` files contain the reward, td-error (squared, mse), and steps taken per episode, these values were
+dynamically during training.
 
-All the ``*_train.json`` files contains the reward, loss, steps take as a function of the steps done (global step).
+All the ``*_train.json`` files contain the reward, loss, and steps taken as a function of the steps done (global step).
 
-Each Module/Script that correspond to a learning algorithn have a ``if __name__ == '__main__':``. It that section, 
+Each Module/Script that corresponds to a learning algorithm has a ``if __name__ == '__main__':``. In that section, 
 we check if there is already a ``Q-table`` or ``Network Weight``, if so, we just evaluate, otherwise we train before evaluating.
 
-The notebook ``Results.ipynb`` gather all the results, plots, performace of each algoriths. We can visualize the optimal
-policy/path found by each algorthm, and we can use it if we want to check all evaluation result for each algorith.
+The notebook ``Results.ipynb`` gathers all the results, plots, and performance of each algorithm. We can visualize the optimal
+policy/path found by each algorithm, and we can use it if we want to check all evaluation results for each algorithm.
 
-**PS** The Live plot/monitoring during the training always take over all window during the training, we can close it without 
-stoping the training if we want to perform other tasks.
+**PS** The Live plot/monitoring during the training always takes over all windows during the training, we can close it without 
+stopping the training if we want to perform other tasks.
 
 
 
