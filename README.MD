@@ -7,12 +7,14 @@
 * Deep Q-Network, with image as input
 
 # Dependencies
-* Python3
-* PyTorch
-* Numpy
-* gymnasium
-* minigrid
-* pickle
+* ``Python3``
+* ``PyTorch``
+* ``Numpy``
+* ``gymnasium``
+* ``minigrid``
+* ``pickle``
+* ``torchinfo``
+
 # How to
 ## Directories and scripts
 * Utilty: Utility class and function
@@ -89,6 +91,31 @@ stoping the training if we want to perform other tasks.
 ### Optimal Path found using DQN-Learning
 <img src="report/figures/DQNLearning_episode.png">
 
+**Network architecture**
+
+```
+==============================================================================
+Layer (type:depth-idx)     Input Shape  Output Shape   Param #    Trainable
+==============================================================================
+DQN                        [1, 49]      [1, 3]         --         True
+├─Sequential: 1-1          [1, 49]      [1, 3]         --         True
+│    └─Linear: 2-1         [1, 49]      [1, 64]        3,200      True
+│    └─ReLU: 2-2           [1, 64]      [1, 64]        --         --
+│    └─Linear: 2-3         [1, 64]      [1, 32]        2,080      True
+│    └─ReLU: 2-4           [1, 32]      [1, 32]        --         --
+│    └─Linear: 2-5         [1, 32]      [1, 3]         99         True
+==============================================================================
+Total params: 5,379
+Trainable params: 5,379
+Non-trainable params: 0
+Total mult-adds (M): 0.01
+==============================================================================
+Input size (MB): 0.00
+Forward/backward pass size (MB): 0.00
+Params size (MB): 0.02
+Estimated Total Size (MB): 0.02
+==============================================================================
+```
 
 **SUMMARY**
 
@@ -104,6 +131,43 @@ stoping the training if we want to perform other tasks.
 
 ### Optimal Path found using DQN-Learning with RGB Image technique
 <img src="report/figures/DQNRGBLearning_episode.png">
+
+**Network architecture**
+
+```
+=================================================================================================
+Layer (type:depth-idx)       Input Shape      Kernel Shape  Output Shape     Param #  Trainable
+=================================================================================================
+CNN_DQN                      [1, 4, 56, 56]   --            [1, 3]           --       True
+├─Sequential: 1-1            [1, 4, 56, 56]   --            [1, 512]         --       True
+│    └─Conv2d: 2-1           [1, 4, 56, 56]   [3, 3]        [1, 16, 27, 27]  576      True
+│    └─BatchNorm2d: 2-2      [1, 16, 27, 27]  --            [1, 16, 27, 27]  32       True
+│    └─ReLU: 2-3             [1, 16, 27, 27]  --            [1, 16, 27, 27]  --       --
+│    └─Conv2d: 2-4           [1, 16, 27, 27]  [3, 3]        [1, 32, 13, 13]  4,608    True
+│    └─BatchNorm2d: 2-5      [1, 32, 13, 13]  --            [1, 32, 13, 13]  64       True
+│    └─ReLU: 2-6             [1, 32, 13, 13]  --            [1, 32, 13, 13]  --       --
+│    └─Conv2d: 2-7           [1, 32, 13, 13]  [3, 3]        [1, 64, 6, 6]    18,432   True
+│    └─BatchNorm2d: 2-8      [1, 64, 6, 6]    --            [1, 64, 6, 6]    128      True
+│    └─ReLU: 2-9             [1, 64, 6, 6]    --            [1, 64, 6, 6]    --       --
+│    └─Conv2d: 2-10          [1, 64, 6, 6]    [3, 3]        [1, 128, 2, 2]   73,728   True
+│    └─BatchNorm2d: 2-11     [1, 128, 2, 2]   --            [1, 128, 2, 2]   256      True
+│    └─Flatten: 2-12         [1, 128, 2, 2]   --            [1, 512]         --       --
+├─Sequential: 1-2            [1, 512]         --            [1, 3]           --       True
+│    └─Linear: 2-13          [1, 512]         --            [1, 64]          32,832   True
+│    └─ReLU: 2-14            [1, 64]          --            [1, 64]          --       --
+│    └─Linear: 2-15          [1, 64]          --            [1, 3]           195      True
+=================================================================================================
+Total params: 130,851
+Trainable params: 130,851
+Non-trainable params: 0
+Total mult-adds (M): 2.19
+=================================================================================================
+Input size (MB): 0.05
+Forward/backward pass size (MB): 0.32
+Params size (MB): 0.52
+Estimated Total Size (MB): 0.89
+=================================================================================================
+```
 
 **SUMMARY**
 

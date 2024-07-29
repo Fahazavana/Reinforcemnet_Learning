@@ -1,6 +1,7 @@
 \newcommand{\bydef}{\overset{\scriptscriptstyle\Delta}{=}}
 \newcommand{\EE}{\mathbb{E}}
 \newcommand{\PP}{\mathbb{P}}
+
 \begin{abstract}
 
 \end{abstract}
@@ -8,7 +9,7 @@
 \section{Introduction}
 
 \section{Problem statement and modelling}
-We aim to build an agent that solves an empty  $6\times6$ grid world, e.g., reaching the green cell as illustrated in Figure \ref{fig:mini-grid}. The agent (red triangle) interacts with the environment through observations, actions and rewards. We use the \texttt{mini-grid} API from the Farama foundation to simulate the environment.
+We aim to build an agent (red triangle) that solves an empty  $6\times6$ grid world, e.g., reaching the green cell as illustrated in Figure \ref{fig:mini-grid}. The agent (red triangle) interacts with the environment through observations, actions and rewards. We use the \texttt{mini-grid} API from the Farama foundation to simulate the environment.
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.9\linewidth]{figures/grid_world.pdf}
@@ -178,8 +179,81 @@ This is illustrated in the figure \ref{fig:fct-approx}.
 In our case, we will use a neural network as a function approximation. Thus we will consider two types.
 
 A feed-forward neural network (MLP) which takes a vector $\mbf{u}\in\RR^{49\times1}$ (state) as input and $q(s,a_1), q(s,a_2),q(s,a_3)$ as output.
+\begin{table}
+	\centering
+	\begin{adjustbox}{max width=\linewidth}
+		\begin{tabular}{@{}llrr@{}}
+			\toprule
+			\textbf{Layer} & \textbf{Input} & \textbf{Output} & \textbf{\# Param} \\
+			\midrule
+			\textbf{DQN}                     & {[1, 49]}           & {[1, 3]}              & --                           \\
+			\quad \textbf{Sequential: 1-1}   & {[1, 49]}           & {[1, 3]}              & --                           \\
+			\quad \quad Linear: 2-1          & {[1, 49]}           & {[1, 64]}             & 3,200                        \\
+			\quad \quad ReLU: 2-2            & {[1, 64]}           & {[1, 64]}             & --                           \\
+			\quad \quad Linear: 2-3          & {[1, 64]}           & {[1, 32]}             & 2,080                        \\
+			\quad \quad ReLU: 2-4            & {[1, 32]}           & {[1, 32]}             & --                           \\
+			\quad \quad Linear: 2-5          & {[1, 32]}           & {[1, 3]}              & 99                           \\
+			\midrule
+			\textbf{Total params:}           &                     &                      & \textbf{5,379}                 \\
+			\textbf{Trainable params:}       &                     &                      & \textbf{5,379}                 \\
+			\textbf{Non-trainable params:}   &                     &                      & \textbf{0}                     \\
+			\textbf{Total mult-adds (M):}    &                     &                      & \textbf{0.01}                  \\
+			\midrule
+			\textbf{Input size (MB):}        &                     &                      & \textbf{0.00}                  \\
+			\textbf{Forward/backward pass size (MB):} &            &                      & \textbf{0.00}                  \\
+			\textbf{Params size (MB):}       &                     &                      & \textbf{0.02}                  \\
+			\textbf{Estimated Total Size (MB):} &                   &                      & \textbf{0.02}                  \\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Model Summary for DQN}
+	\label{tab:dqn}
+\end{table}
+Similarly, Convolutional Neural networks (CNN), take a stack of four frames (images) at four successive time steps, e.g. a $4\times56\times56$ tensor as input and the same output as the MLP, The architecture of these neural networks are described in respectively in \ref{tab:dqn} and \ref{tab:cnn-dqn}.
 
-Similarly, Convolutional Neural networks (CNN), take a stack of four frames (images) at four successive time steps, e.g. a $4\times56\times56$ tensor as input and the same output as the MLP, The architecture of these neural networks are described in respectively in REF-MLP and REF-CNN.
+\begin{table}
+	\centering
+	\begin{adjustbox}{max width=\linewidth}
+	\begin{tabular}{@{}llcrr@{}}
+		\toprule
+		Layer (type:depth-idx) & Input& Kernel& Output & \# Param \\
+		\midrule
+		\textbf{CNN\_DQN}                                   & [1, 4, 56, 56]   & --            & [1, 3]           & --     \\
+		\quad \textbf{Sequential: 1-1}                   & [1, 4, 56, 56]   & --            & [1, 512]         & --     \\
+		\quad \quad Conv2d: 2-1                  & [1, 4, 56, 56]   & [3, 3]        & [1, 16, 27, 27]  & 576    \\
+		\quad \quad BatchNorm2d: 2-2             & [1, 16, 27, 27]  & --            & [1, 16, 27, 27]  & 32     \\
+		\quad \quad ReLU: 2-3                    & [1, 16, 27, 27]  & --            & [1, 16, 27, 27]  & --     \\
+		\quad \quad Conv2d: 2-4                  & [1, 16, 27, 27]  & [3, 3]        & [1, 32, 13, 13]  & 4,608  \\
+		\quad \quad BatchNorm2d: 2-5             & [1, 32, 13, 13]  & --            & [1, 32, 13, 13]  & 64     \\
+		\quad \quad ReLU: 2-6                    & [1, 32, 13, 13]  & --            & [1, 32, 13, 13]  & --     \\
+		\quad \quad Conv2d: 2-7                  & [1, 32, 13, 13]  & [3, 3]        & [1, 64, 6, 6]    & 18,432 \\
+		\quad \quad BatchNorm2d: 2-8             & [1, 64, 6, 6]    & --            & [1, 64, 6, 6]    & 128    \\
+		\quad \quad ReLU: 2-9                    & [1, 64, 6, 6]    & --            & [1, 64, 6, 6]    & --     \\
+		\quad \quad Conv2d: 2-10                 & [1, 64, 6, 6]    & [3, 3]        & [1, 128, 2, 2]   & 73,728 \\
+		\quad \quad BatchNorm2d: 2-11            & [1, 128, 2, 2]   & --            & [1, 128, 2, 2]   & 256    \\
+		\quad \quad Flatten: 2-12                & [1, 128, 2, 2]   & --            & [1, 512]         & --     \\
+		\quad \textbf{Sequential: 1-2}                   & [1, 512]         & --            & [1, 3]           & --     \\
+		\quad \quad Linear: 2-13                 & [1, 512]         & --            & [1, 64]          & 32,832 \\
+		\quad \quad ReLU: 2-14                   & [1, 64]          & --            & [1, 64]          & --     \\
+		\quad \quad Linear: 2-15                 & [1, 64]          & --            & [1, 3]           & 195    \\
+		\midrule
+		\textbf{Total params}                              &                   &              &                   & \textbf{130,851}\\
+		\textbf{Trainable params:}                         &                   &              &                   & \textbf{130,851}\\
+		\textbf{Non-trainable params:}                     &                   &              &                   & 0      \\
+		\textbf{Total mult-adds (M):}                      &                   &              &                   & \textbf{2.19}   \\
+		\midrule
+		\textbf{Input size (MB):}                          &                   &              &                   & \textbf{0.05}    \\
+		\textbf{Forward/backward pass size (MB):}          &                   &              &                   & \textbf{0.32}    \\
+		\textbf{Params size (MB):}                         &                   &              &                   & \textbf{0.52}     \\
+		\textbf{Estimated Total Size (MB):}                &                   &              &                   & \textbf{0.89}     \\
+		\bottomrule
+	\end{tabular}
+	\end{adjustbox}
+	\caption{Model Architecture}
+	\label{tab:cnn-dqn}
+\end{table}
+
+
 
 
 As we do not have any labels to train the networks, we use two networks: the \texttt{policy\_net} and \texttt{target\_net}. The first one is optimised with the \texttt{Adam} optimizer, while the second one is fixed, and used to generate a sort of label for the \texttt{policy\_net}. We also synchronize the weight of the two networks in a regular period of the training, to move toward the optimal values.
@@ -238,63 +312,103 @@ In this section we discus about our results an present them. The smoothed plot w
 	\includegraphics[width=\linewidth]{figures/QLearning_episode.pdf}
 	\caption{Q-Learning per episode training metrics}
 \end{figure}
+
+\begin{table}
+	\centering
+	\begin{tabular}{@{}lrr@{}}
+		\cmidrule(l){2-3}
+		& Train & Evaluation \\ \midrule
+		Episodes        &  512      &  1000          \\
+		Completion rate &   92.97\%    &  100\%           \\
+		Average rewards &   0.808    &    0.958        \\
+		Average steps   &    53   &     12       \\ \bottomrule
+	\end{tabular}
+\end{table}
+
 \subsection{SARSA-Learning}
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\linewidth]{figures/SARSALearning_episode.pdf}
 	\caption{SARSA-Learning per episode training metrics}
 \end{figure}
+\begin{table}
+	\centering
+	\begin{tabular}{@{}lrr@{}}
+		\cmidrule(l){2-3}
+		& Train & Evaluation \\ \midrule
+		Episodes        &  600      &  1000          \\
+		Completion rate &   95.67\%    &  100\%           \\
+		Average rewards &   0.844    &    0.958        \\
+		Average steps   &    43   &     12       \\ \bottomrule
+	\end{tabular}
+\end{table}
+
 \subsection{Deep Q-Network Learning}
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\linewidth]{figures/DQNLearning_episode.pdf}
 	\caption{DQN-Learning per episode training metrics}
 \end{figure}
+\begin{table}
+	\centering
+	\begin{tabular}{@{}lrr@{}}
+		\cmidrule(l){2-3}
+		& Train & Evaluation \\ \midrule
+		Episodes        &  2000      &  1000          \\
+		Completion rate &   99.2\%    &  100\%           \\
+		Average rewards &   0.912    &    0.958        \\
+		Average steps   &    25   &     12       \\ \bottomrule
+	\end{tabular}
+\end{table}
+
 \subsection{Deep Q-Network Learning with RGB Image}
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\linewidth]{figures/DQNRGBLearning_episode.pdf}
 	\caption{DQN-Learning with RGB Image technique per episode training metrics}
 \end{figure}
+\begin{table}
+	\centering
+	\begin{tabular}{@{}lrr@{}}
+		\cmidrule(l){2-3}
+		& Train & Evaluation \\ \midrule
+		Episodes        &  1500      &  1000          \\
+		Completion rate &   98\%    &  100\%           \\
+		Average rewards &   0.892    &    0.961        \\
+		Average steps   &    30   &     11       \\ \bottomrule
+	\end{tabular}
+\end{table}
 
-\begin{tikzpicture}
+\begin{figure}
+	\begin{tikzpicture}
+	\fill[darkgray!80] (-1,-1) rectangle (7,7);
+	\fill[black!90] (0,0) rectangle (6,6);
+	\fill[green] (5,0) rectangle (6,1);
 
-	% Define colors
-	\definecolor{darkgray}{rgb}{0.3, 0.3, 0.3}
-	\definecolor{lightgray}{rgb}{0.7, 0.7, 0.7}
-	\definecolor{green}{rgb}{0, 1, 0}
-	\definecolor{red}{rgb}{1, 0, 0}
-
-	% Draw the background
-	\fill[darkgray] (0,0) rectangle (5,5);
-
-	% Draw the grid
-	\foreach \x in {0, 1, ..., 4} {
-		\foreach \y in {2, 3, 4} {
-			\fill[lightgray] (\x,\y) rectangle (\x+1,\y+1);
-		}
-		\foreach \y in {0, 1} {
-			\fill[black] (\x,\y) rectangle (\x+1,\y+1);
-		}
-	}
-
-	% Draw the green square
-	\fill[green] (4,0) rectangle (5,1);
-
-	% Draw the red triangle
-	\fill[red] (0.2,4.8) -- (0.2,4.2) -- (0.6,4.5) -- cycle;
-
-	% Draw the border lines of the grid
 	\foreach \x in {0, 1, 2, 3, 4, 5} {
-		\draw[gray] (\x,2) -- (\x,5);
-		\draw[gray] (\x,0) -- (\x,2);
+		\draw[gray, line width=1pt] (\x,0) -- (\x,6);
+		\draw[gray, line width=1pt] (0, \x) -- (6,\x);
 	}
-	\foreach \y in {0, 1, 2, 3, 4, 5} {
-		\draw[gray] (0,\y) -- (5,\y);
-	}
+	\draw[dashed, line width=1pt, color=cyan, line cap=round, line width=2pt, rounded corners] (0.5,5.4)--++(1.9,0)--++(0,-5.2)--++(3.1,0);
+	\draw[dashed, line width=1pt, color=orange, line cap=round, line width=2pt, rounded corners] (0.5,5.5)--++(2,0)--++(0,-5.2)--++(3,0);
+	\draw[dashed, line width=1pt, color=blue, line cap=round, line width=2pt, rounded corners] (0.5,5.6)--++(3,0)--++(0,-5.2)--++(2,0);
+	\draw[dashed, line width=1pt, color=yellow, line cap=round, line width=2pt, rounded corners] (0.5,5.7)--++(5,0)--++(0,-5.2);
 
+	\begin{scope}[yshift=1cm]
+			\fill[green, scale=0.6, yshift=-1.6cm, xshift=-.2cm] (-1,-2) rectangle (0,-3);
+			\node (t) at (0.5,-2.5) {Target};
+			\fill[red, xshift=0.35cm] (-1,-3.8) -- (-1,-3.2) -- (-.6,-3.5) -- cycle;
+			\node (t) at (0.5,-3.5) {Agent};
+			\draw[color=cyan, line width=2pt, line cap=round,dashed] (1.5,-2.5) --++(0.5,0) node[right, black] {Q-Learning};
+			\draw[color=orange, line width=2pt, line cap=round,dashed] (1.5,-3.5) --++(0.5,0) node[right, black] {SARSA};
+			\draw[color=blue, line width=2pt, line cap=round,dashed] (4.5,-2.5) --++(0.5,0) node[right, black] {DQN};
+			\draw[color=yellow, line width=2pt, line cap=round,dashed] (4.5,-3.5) --++(0.5,0) node[right, black] {DQN-RGB};
+	\end{scope}
+	\fill[red] (0.2,5.8) -- (0.2,5.2) -- (0.6,5.5) -- cycle;
 \end{tikzpicture}
-
+\caption{Optimal Policy found by each algorithm}
+\label{img:optimal}
+\end{figure}
 \section{Conclusion}
 %\begin{thebibliography}{1}
 %\end{thebibliography}
