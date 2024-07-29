@@ -124,7 +124,7 @@ class MiniGridDQN():
 
 
 def eval(env, policy_net, strategy, episodes):
-    print("\n\nEvaluation...")
+    print("Evaluation...")
     steps_list, rewards_list = [], []
     finish_counter = 0
     policy_net.eval()
