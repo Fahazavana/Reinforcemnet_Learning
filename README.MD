@@ -1,97 +1,105 @@
-# REINFORCEMENT LEARNING
-## TABULAR-METHODS
-* SARSA
-* Q-Learning
-## DEEP-LEARNING TECHNIQUES
-* Deep Q-Network
-* Deep Q-Network, with image as input
+# Reinforcement Learning
+## Overview
+This project explores various reinforcement learning (RL) algorithms, both traditional and deep learning-based, 
+to solve navigation tasks in a grid environment. The project implements and evaluates several RL methods, including
+tabular approaches like Q-Learning and SARSA, as well as deep learning techniques such as Deep Q-Networks (DQN).
+The performance of these algorithms is analyzed and compared based on their ability to learn optimal policies for 
+navigating the grid.
 
-# Dependencies
-* ``Python3``
-* ``PyTorch``
-* ``Numpy``
-* ``gymnasium``
-* ``minigrid``
-* ``pickle``
-* ``torchinfo``
+### Tabular Methods:
+* **Q-Learning**: A model-free RL algorithm that learns the value of actions in each state using a Q-table.
+* **SARSA**: An on-policy RL algorithm that updates the Q-value based on the action performed in the current state.
 
-# How to
-## Directories and scripts
-* Utility: Utility class and function
-  * ``EpsilonStrategy`` and ``DQNEpsilonStrategy``: Helper class for $\epsilon$-Greedy and decresinag epsilon
-  * ``MiniGrid``: Helper class for each use case of the mini-grid:
-    * ``MiniGridBase``: Defaults
-    * ``MiniGridHash``: The observation become the MD5 hash of the observation
-    * ``MiniGridRaw``: The observation becomes a normalized flattened array
-    * ``MiniGridImage``: The observation is the normalized grayscale of the partial observation
-    * ``get_device``: a function that return ``mps``,  ``cuda`` or ``cpu`` depending on the platform
-  * ``ReplayMemory``: Contain the named Tuple ``Transition`` and a Class for the Replay Buffer
-  * ``Plots``: Live training monitoring plots, and some helper function for the plots in ``Results.ipynb``
-* ``Q_Learning``: Folder for Q-Learning algorithms
-  * ``QLearning``: Main script/Module for Q-Learning
-  * ``q_learning_table.pkl``: Optimal Q-table found using the Q-learning algorithm
-* ``SARSA``: Folder for SARSA-Learning algorithms
-  * ``SARSA``: Main script/Module for SARSA-Learning
-  * ``sarsa_learning_table.pkl``: Optimal Q-table found using the SARSA-learning algorithm
-* ``DQN``: Folder for Deep Q-Network approach
-  * ``DQN``: Main scripts/Module for simple Deep Q-Network
-  * ``dqn.pth``: Optimal weights of the policy network found using DQN
-  * ``DQNIMAGE``: Main scripts/Module for CNN Deep Q-Network
-  * ``dqn_image.pth``: Optimal weights of the policy netwok found using CNN-DQN
-
-All the ``*_live_plot.json`` files contain the reward, td-error (squared, mse), and steps taken per episode, these values were
-dynamically during training.
-
-All the ``*_train.json`` files contain the reward, loss, and steps taken as a function of the steps done (global step).
-
-Each Module/Script that corresponds to a learning algorithm has a ``if __name__ == '__main__':``. In that section, 
-we check if there is already a ``Q-table`` or ``Network Weight``, if so, we just evaluate, otherwise we train before evaluating.
-
-The notebook ``Results.ipynb`` gathers all the results, plots, and performance of each algorithm. We can visualize the optimal
-policy/path found by each algorithm, and we can use it if we want to check all evaluation results for each algorithm.
-
-**PS** The Live plot/monitoring during the training always takes over all windows during the training, we can close it without 
-stopping the training if we want to perform other tasks.
+### Deep Learning Techniques:
+* **Deep Q-Network (DQN)**: Utilizes neural networks to approximate the Q-values for each state-action pair, enabling the handling of large state spaces.
+* **DQN with Image Input**: Enhances DQN by incorporating image-based observations, using convolutional neural networks (CNNs) to process visual input.
 
 
+## Dependencies
+The scripts require the following dependencies to run;
+- `Python3`
+- `PyTorch`
+- `Numpy`
+- `gymnasium`
+- `minigrid`
+- `pickle`
+- `torchinfo`
+- `jupyter`
+- 
+### Directories and Scripts
+#### Utility
+- **EpsilonStrategy** and **DQNEpsilonStrategy**: Helper classes for $\epsilon$-Greedy and decreasing epsilon strategies.
+- **MiniGrid**: Helper classes for various use cases of the mini-grid:
+  - **MiniGridBase**: Defaults
+  - **MiniGridHash**: Observation becomes the MD5 hash of the observation
+  - **MiniGridRaw**: Observation becomes a normalized, flattened array
+  - **MiniGridImage**: Observation is the normalized grayscale of the partial observation
+- **get_device**: Function that returns `mps`, `cuda`, or `cpu` depending on the platform.
+- **ReplayMemory**: Contains the named tuple `Transition` and a class for the Replay Buffer.
+- **Plots**: Live training monitoring plots and helper functions for the plots in `Results.ipynb`.
 
+#### Q_Learning
+- **QLearning**: Main script/module for Q-Learning
+- **q_learning_table.pkl**: Optimal Q-table found using the Q-learning algorithm
 
-# RESULTS
-### Optimal Path found using Q-Learning
-<img src="report/figures/QLearning_episode.png">
+#### SARSA
+- **SARSA**: Main script/module for SARSA-Learning
+- **sarsa_learning_table.pkl**: Optimal Q-table found using the SARSA-learning algorithm
 
-**SUMMARY**
+#### DQN
+- **DQN**: Main script/module for simple Deep Q-Network
+- **dqn.pth**: Optimal weights of the policy network found using DQN
+- **DQNIMAGE**: Main script/module for CNN Deep Q-Network
+- **dqn_image.pth**: Optimal weights of the policy network found using CNN-DQN
 
-|               | TRAIN  | EVALUATION |
+#### Logs and Results
+- All `*_live_plot.json` files contain the reward, TD-error (squared, MSE), and steps taken per episode, recorded dynamically during training.
+- All `*_train.json` files contain the reward, loss, and steps taken as a function of the steps done (global step).
+
+### Execution
+Each module/script corresponding to a learning algorithm has a `if __name__ == '__main__':` block. In this section:
+- If a `Q-table` or `Network Weight` already exists, it evaluates the model.
+- Otherwise, it trains the model before evaluating.
+
+### Results Notebook
+- **Results.ipynb**: Gathers all results, plots, and performance metrics of each algorithm. Visualize the optimal policy/path found by each algorithm and check all evaluation results.
+
+**Note**: The live plot/monitoring during training always takes over all windows. You can close it without stopping the training if you want to perform other tasks.
+
+# Results
+
+### Optimal Path Found Using Q-Learning
+![Q-Learning Episode](report/figures/QLearning_episode.png)
+
+**Summary**
+
+|               | Train  | Evaluation |
 |---------------|--------|------------|
 |Episodes       | 512    | 1000       |
-|Completion rate| 92.97% | 100%       |
+|Completion Rate| 92.97% | 100%       |
 |Average Reward | 0.808  | 0.958      |
-|Average steps  | 52.510 | 12.000     |
+|Average Steps  | 52.510 | 12.000     |
 
+![Q-Learning GIF](Q_Learning/q_learning.gif)
 
-<img src='Q_Learning/q_learning.gif' width='400px'>
+### Optimal Path Found Using SARSA-Learning
+![SARSA-Learning Episode](report/figures/SARSALearning_episode.png)
 
-### Optimal Path found using SARSA-Learning
-<img src="report/figures/SARSALearning_episode.png">
+**Summary**
 
-**SUMMARY**
-
-|               | TRAIN  | EVALUATION |
+|               | Train  | Evaluation |
 |---------------|--------|------------|
 |Episodes       | 600    | 1000       |
-|Completion rate| 95.67% | 100%       |
+|Completion Rate| 95.67% | 100%       |
 |Average Reward | 0.844  | 0.958      |
-|Average steps  | 43.185 | 12.000     |
+|Average Steps  | 43.185 | 12.000     |
 
+![SARSA-Learning GIF](SARSA/sarsa.gif)
 
-<img src='SARSA/sarsa.gif' width='400px'>
+### Optimal Path Found Using DQN-Learning
+![DQN-Learning Episode](report/figures/DQNLearning_episode.png)
 
-
-### Optimal Path found using DQN-Learning
-<img src="report/figures/DQNLearning_episode.png">
-
-**Network architecture**
+**Network Architecture**
 
 ```
 ==============================================================================
@@ -117,22 +125,21 @@ Estimated Total Size (MB): 0.02
 ==============================================================================
 ```
 
-**SUMMARY**
+**Summary**
 
-|               | TRAIN  | EVALUATION |
+|               | Train  | Evaluation |
 |---------------|--------|------------|
 |Episodes       | 2000   | 1000       |
-|Completion rate| 99.2%  | 100%       |
+|Completion Rate| 99.2%  | 100%       |
 |Average Reward | 0.912  | 0.958      |
-|Average steps  | 24.794 | 12.000     |
+|Average Steps  | 24.794 | 12.000     |
 
+![DQN-Learning GIF](DQN/dqn.gif)
 
-<img src='DQN/dqn.gif' width='400px'>
+### Optimal Path Found Using DQN-Learning with RGB Image Technique
+![DQN-RGB-Learning Episode](report/figures/DQNRGBLearning_episode.png)
 
-### Optimal Path found using DQN-Learning with RGB Image technique
-<img src="report/figures/DQNRGBLearning_episode.png">
-
-**Network architecture**
+**Network Architecture**
 
 ```
 =================================================================================================
@@ -169,21 +176,24 @@ Estimated Total Size (MB): 0.89
 =================================================================================================
 ```
 
-**SUMMARY**
+**Summary**
 
-|               | TRAIN  | EVALUATION |
+|               | Train  | Evaluation |
 |---------------|--------|------------|
 |Episodes       | 1500   | 1000       |
-|Completion rate| 98%    | 100%       |
+|Completion Rate| 98%    | 100%       |
 |Average Reward | 0.892  | 0.961      |
-|Average steps  | 30.068 | 11.000     |
+|Average Steps  | 30.068 | 11.000     |
 
+![DQN-RGB-Learning GIF](DQN/dqn_img.gif)
 
-<img src='DQN/dqn_img.gif' width='400px'>
+# To Do
+- Add docstrings
+- Improve code readability
+- Error Handling
+- Make the live plot compatible with Jupyter if possible
 
-# TO DO
-* Add docstring
-* Improve code readability
-* Error Handling
-* Make the live plot compatible with Jupyter if possible
-# REFERENCES
+# References
+* Prof Herman Engelbrecht, Reinforcement Learning Lecture, Stellenbosch University, 2024.
+* Richard S. Sutton, Andrew Barto, Reinforcement Learning: An Introduction.
+* Farama Foundation, _minigrid_, [https://minigrid.farama.org/]() 
