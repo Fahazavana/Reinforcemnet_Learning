@@ -3,38 +3,38 @@
 \newcommand{\PP}{\mathbb{P}}
 
 \begin{abstract}
-
+	In this work, we explore four reinforcement learning algorithms to solve a simple empty grid world problem. We use Q-Learning and SARSA for a tabular approach while using classic MLP and  CNN  for Deep Q-network or function approximation methods. Evaluated over 1000 episodes on the optimal policy, the four methods achieved a 100\% of completion rate. The CNN DQN uses 11 steps to solve the problem while the three other uses 12 steps.
 \end{abstract}
 
 \section{Introduction}
-When it comes automatic sequential decision making with a specific objective for an agent in given environment reinforcement learning is a best approach to use. In contrast with that, given grid-world, how we can train an agent to navigate form a point A to a point B, in an optimal way with the maximum score. To solve this problem, we explore four Reinforcement Learning algorithm.
+When it comes to automatic sequential decision-making with a specific objective for an agent in a given environment reinforcement learning is the best approach to consider. In contrast, given grid-world, how can we train an agent to navigate from point A to point B, with the maximum score? To solve this problem, we explore four Reinforcement Learning algorithms.
 
 
-For that, we start by defining the problem in Section \ref{sec1}, and brief overview of reinforcement learning in the Section \ref{sec2}. Then we present the tabular methods and deep learning techniques respectively in section \ref{sec3} and \ref{sec4}.
+For that, we start by defining the problem in Section \ref{sec1}, and a brief overview of reinforcement learning in Section \ref{sec2}. Then we present the tabular methods and deep learning techniques respectively in section \ref{sec3} and \ref{sec4}.
 
-Section \ref{sec5} delve on how we deal with our hyper-parameter, and model assessment. Finally in the Section \ref{sec6}, we presents our finding, compare and discuss about them.
+Section \ref{sec5} delves on how we deal with our hyper-parameter, and model assessment. Finally, in Section \ref{sec6}, we present our findings and compare and discuss them.
 \section{Problem statement and modelling}\label{sec1}
 We aim to build an agent (red triangle) that solves an empty  $6\times6$ grid world, e.g., reaching the green cell as illustrated in Figure \ref{fig:mini-grid}. The agent (red triangle) interacts with the environment through observations, actions and rewards. We use the \texttt{mini-grid} API from the Farama foundation to simulate the environment \cite{minigrid}.
 \begin{figure}
 	\centering
-		\begin{tikzpicture}
-			\fill[darkgray!80] (-1,-1) rectangle (7,7);
-			\fill[black!90] (0,0) rectangle (6,6);
-			\fill[green] (5,0) rectangle (6,1);
+	\begin{tikzpicture}
+		\fill[darkgray!80] (-1,-1) rectangle (7,7);
+		\fill[black!90] (0,0) rectangle (6,6);
+		\fill[green] (5,0) rectangle (6,1);
 
-			\foreach \x in {0, 1, 2, 3, 4, 5} {
-				\draw[gray, line width=1pt] (\x,0) -- (\x,6);
-				\draw[gray, line width=1pt] (0, \x) -- (6,\x);
-			}
+		\foreach \x in {0, 1, 2, 3, 4, 5} {
+			\draw[gray, line width=1pt] (\x,0) -- (\x,6);
+			\draw[gray, line width=1pt] (0, \x) -- (6,\x);
+		}
 
-			\begin{scope}[yshift=1cm]
-				\fill[green, scale=0.6, yshift=-1.6cm, xshift=-.2cm] (-1,-2) rectangle (0,-3);
-				\node (t) at (0.5,-2.5) {Target};
-				\fill[red, xshift=2.5cm, yshift=1.05cm] (-1,-3.8) -- (-1,-3.2) -- (-.6,-3.5) -- cycle;
-				\node (t) at (2.5,-2.5) {Agent};
-			\end{scope}
-			\fill[red] (0.2,5.8) -- (0.2,5.2) -- (0.6,5.5) -- cycle;
-		\end{tikzpicture}
+		\begin{scope}[yshift=1cm]
+			\fill[green, scale=0.6, yshift=-1.6cm, xshift=-.2cm] (-1,-2) rectangle (0,-3);
+			\node (t) at (0.5,-2.5) {Target};
+			\fill[red, xshift=2.5cm, yshift=1.05cm] (-1,-3.8) -- (-1,-3.2) -- (-.6,-3.5) -- cycle;
+			\node (t) at (2.5,-2.5) {Agent};
+		\end{scope}
+		\fill[red] (0.2,5.8) -- (0.2,5.2) -- (0.6,5.5) -- cycle;
+	\end{tikzpicture}
 	\caption{An illustration of the \texttt{MiniGrid-Empty-8x8-v0} environment}
 	\label{fig:mini-grid}
 \end{figure}
@@ -236,40 +236,40 @@ Similarly, Convolutional Neural networks (CNN), take a stack of four frames (ima
 \begin{table}
 	\centering
 	\begin{adjustbox}{max width=\linewidth}
-	\begin{tabular}{@{}llcrr@{}}
-		\toprule
-		Layer (type:depth-idx) & Input& Kernel& Output & \# Param \\
-		\midrule
-		\textbf{CNN\_DQN}                                   & [1, 4, 56, 56]   & --            & [1, 3]           & --     \\
-		\quad \textbf{Sequential: 1-1}                   & [1, 4, 56, 56]   & --            & [1, 512]         & --     \\
-		\quad \quad Conv2d: 2-1                  & [1, 4, 56, 56]   & [3, 3]        & [1, 16, 27, 27]  & 576    \\
-		\quad \quad BatchNorm2d: 2-2             & [1, 16, 27, 27]  & --            & [1, 16, 27, 27]  & 32     \\
-		\quad \quad ReLU: 2-3                    & [1, 16, 27, 27]  & --            & [1, 16, 27, 27]  & --     \\
-		\quad \quad Conv2d: 2-4                  & [1, 16, 27, 27]  & [3, 3]        & [1, 32, 13, 13]  & 4,608  \\
-		\quad \quad BatchNorm2d: 2-5             & [1, 32, 13, 13]  & --            & [1, 32, 13, 13]  & 64     \\
-		\quad \quad ReLU: 2-6                    & [1, 32, 13, 13]  & --            & [1, 32, 13, 13]  & --     \\
-		\quad \quad Conv2d: 2-7                  & [1, 32, 13, 13]  & [3, 3]        & [1, 64, 6, 6]    & 18,432 \\
-		\quad \quad BatchNorm2d: 2-8             & [1, 64, 6, 6]    & --            & [1, 64, 6, 6]    & 128    \\
-		\quad \quad ReLU: 2-9                    & [1, 64, 6, 6]    & --            & [1, 64, 6, 6]    & --     \\
-		\quad \quad Conv2d: 2-10                 & [1, 64, 6, 6]    & [3, 3]        & [1, 128, 2, 2]   & 73,728 \\
-		\quad \quad BatchNorm2d: 2-11            & [1, 128, 2, 2]   & --            & [1, 128, 2, 2]   & 256    \\
-		\quad \quad Flatten: 2-12                & [1, 128, 2, 2]   & --            & [1, 512]         & --     \\
-		\quad \textbf{Sequential: 1-2}                   & [1, 512]         & --            & [1, 3]           & --     \\
-		\quad \quad Linear: 2-13                 & [1, 512]         & --            & [1, 64]          & 32,832 \\
-		\quad \quad ReLU: 2-14                   & [1, 64]          & --            & [1, 64]          & --     \\
-		\quad \quad Linear: 2-15                 & [1, 64]          & --            & [1, 3]           & 195    \\
-		\midrule
-		\textbf{Total params}                              &                   &              &                   & \textbf{130,851}\\
-		\textbf{Trainable params:}                         &                   &              &                   & \textbf{130,851}\\
-		\textbf{Non-trainable params:}                     &                   &              &                   & 0      \\
-		\textbf{Total mult-adds (M):}                      &                   &              &                   & \textbf{2.19}   \\
-		\midrule
-		\textbf{Input size (MB):}                          &                   &              &                   & \textbf{0.05}    \\
-		\textbf{Forward/backward pass size (MB):}          &                   &              &                   & \textbf{0.32}    \\
-		\textbf{Params size (MB):}                         &                   &              &                   & \textbf{0.52}     \\
-		\textbf{Estimated Total Size (MB):}                &                   &              &                   & \textbf{0.89}     \\
-		\bottomrule
-	\end{tabular}
+		\begin{tabular}{@{}llcrr@{}}
+			\toprule
+			Layer (type:depth-idx) & Input& Kernel& Output & \# Param \\
+			\midrule
+			\textbf{CNN\_DQN}                                   & [1, 4, 56, 56]   & --            & [1, 3]           & --     \\
+			\quad \textbf{Sequential: 1-1}                   & [1, 4, 56, 56]   & --            & [1, 512]         & --     \\
+			\quad \quad Conv2d: 2-1                  & [1, 4, 56, 56]   & [3, 3]        & [1, 16, 27, 27]  & 576    \\
+			\quad \quad BatchNorm2d: 2-2             & [1, 16, 27, 27]  & --            & [1, 16, 27, 27]  & 32     \\
+			\quad \quad ReLU: 2-3                    & [1, 16, 27, 27]  & --            & [1, 16, 27, 27]  & --     \\
+			\quad \quad Conv2d: 2-4                  & [1, 16, 27, 27]  & [3, 3]        & [1, 32, 13, 13]  & 4,608  \\
+			\quad \quad BatchNorm2d: 2-5             & [1, 32, 13, 13]  & --            & [1, 32, 13, 13]  & 64     \\
+			\quad \quad ReLU: 2-6                    & [1, 32, 13, 13]  & --            & [1, 32, 13, 13]  & --     \\
+			\quad \quad Conv2d: 2-7                  & [1, 32, 13, 13]  & [3, 3]        & [1, 64, 6, 6]    & 18,432 \\
+			\quad \quad BatchNorm2d: 2-8             & [1, 64, 6, 6]    & --            & [1, 64, 6, 6]    & 128    \\
+			\quad \quad ReLU: 2-9                    & [1, 64, 6, 6]    & --            & [1, 64, 6, 6]    & --     \\
+			\quad \quad Conv2d: 2-10                 & [1, 64, 6, 6]    & [3, 3]        & [1, 128, 2, 2]   & 73,728 \\
+			\quad \quad BatchNorm2d: 2-11            & [1, 128, 2, 2]   & --            & [1, 128, 2, 2]   & 256    \\
+			\quad \quad Flatten: 2-12                & [1, 128, 2, 2]   & --            & [1, 512]         & --     \\
+			\quad \textbf{Sequential: 1-2}                   & [1, 512]         & --            & [1, 3]           & --     \\
+			\quad \quad Linear: 2-13                 & [1, 512]         & --            & [1, 64]          & 32,832 \\
+			\quad \quad ReLU: 2-14                   & [1, 64]          & --            & [1, 64]          & --     \\
+			\quad \quad Linear: 2-15                 & [1, 64]          & --            & [1, 3]           & 195    \\
+			\midrule
+			\textbf{Total params}                              &                   &              &                   & \textbf{130,851}\\
+			\textbf{Trainable params:}                         &                   &              &                   & \textbf{130,851}\\
+			\textbf{Non-trainable params:}                     &                   &              &                   & 0      \\
+			\textbf{Total mult-adds (M):}                      &                   &              &                   & \textbf{2.19}   \\
+			\midrule
+			\textbf{Input size (MB):}                          &                   &              &                   & \textbf{0.05}    \\
+			\textbf{Forward/backward pass size (MB):}          &                   &              &                   & \textbf{0.32}    \\
+			\textbf{Params size (MB):}                         &                   &              &                   & \textbf{0.52}     \\
+			\textbf{Estimated Total Size (MB):}                &                   &              &                   & \textbf{0.89}     \\
+			\bottomrule
+		\end{tabular}
 	\end{adjustbox}
 	\caption{Model Architecture for DQN-Image}
 	\label{tab:cnn-dqn}
@@ -325,9 +325,9 @@ So, instead of using that approach, we will use trial and error to find good hyp
 \subsection{Model evaluation}
 To evaluate the model, we run the agents in the environment for $1000$ episodes, then compute the completion rate, the reward average, and the averaged steps for each method.
 
-We also investigate these values for the training process to assess the speed and efficiency of each method, in addition to the plot of the loss and accumulated rewards.
+We also investigate these values for the training process to assess the speed and efficiency of each method, in addition to the loss plots and accumulated rewards.
 \section{Results and discussion}\label{sec6}
-In this section we discus about our results an present them. We smoothed some of the curve using the exponential moving average wit a factor of $0.7$, to obtain a better visualisation.
+In this section, we discuss our results and present them. We smoothed some of the curves using the exponential moving average with a factor of $0.7$, to obtain a better visualisation.
 \subsection{Q-Learning}
 After training the $Q$-Learning algorithm for $512$ episodes, using a discount factor $\gamma=0.9$, $\epsilon$ starting from $1$ to $0.01$ with decay rate of $\Delta=3000$ and a learning rate $\alpha=0.1$. We observe in Figure \ref{fig:qlog} the elution of the averaged cumulated squared TD-error and, reward, and steps.
 \begin{figure}[H]
@@ -336,7 +336,7 @@ After training the $Q$-Learning algorithm for $512$ episodes, using a discount f
 	\caption{Q-Learning per episode training metrics}
 	\label{fig:qlog}
 \end{figure}
-During the phase were we $\epsilon$ is big, the agent explore its environment. On it reach some point, the agent start to exploit the optimal policy found by algorithm. We resume the training and an evaluation phase in Table \ref{tab:ql}, and the optimal policy is shown in figure \ref{fig:optimal}.
+During the phase where we $\epsilon$ is big, the agent explores its environment. Once it reaches some point, the agent starts exploiting the optimal policy. We resume the training and evaluation phase in Table \ref{tab:ql}, and the optimal policy is shown in Figure \ref{fig:optimal}.
 \begin{table}
 	\centering
 	\begin{tabular}{@{}lrr@{}}
@@ -359,7 +359,7 @@ Similarly, we train the $SARSA$-Learning algorithm for $600$ episodes, using a d
 	\caption{SARSA-Learning per episode training metrics}
 	\label{fig:sarsalog}
 \end{figure}
-We observe some similar pattern in the learning curve of the $Q$-Learning and SARSA. But SARSA required further episode before being stable.  We resume the training and an evaluation phase in Table \ref{tab:sarsa}, and the optimal policy is shown in figure \ref{fig:optimal}.
+We observe some similar patterns in the learning curve of the $Q$-Learning and SARSA. However, SARSA required further episodes before being stable.  We resume the training and evaluation phase in Table \ref{tab:sarsa}, and the optimal policy is shown in Figure \ref{fig:optimal}.
 \begin{table}
 	\centering
 	\begin{tabular}{@{}lrr@{}}
@@ -370,25 +370,25 @@ We observe some similar pattern in the learning curve of the $Q$-Learning and SA
 		Average rewards &   0.844    &    0.958        \\
 		Average steps   &    43   &     12       \\ \bottomrule
 	\end{tabular}
-		\caption{Training and evaluation summary for {SARSA-Learning}}
+	\caption{Training and evaluation summary for {SARSA-Learning}}
 	\label{tab:sarsa}
 \end{table}
 
-Overall the two $Q$-Learning and SARSA, performed well and give similar result, and yielded the same policy. However, as we can observe in Figure \ref{fig:optimal}, several path with 12 steps is possible, and the choice of the agent seems to be the middle (nearest) one. It some how he summarize these path, but it may also because of the randomness introduced by the $\epsilon$-greedy strategy.
+Overall the $Q$-Learning and SARSA performed well. They gave similar results and yielded the same policy. However, as we can observe in Figure \ref{fig:optimal}, several paths with 12 steps is possible, and the choice of the agent seems to be the middle (nearest) one. Somehow it summarizes these paths, but it may also be due to the randomness introduced by the $\epsilon$-greedy strategy.
 
 
 
 
-Now the two next subsection presents our finding using deep learning technique.
+Now the next subsections present our findings using deep learning techniques.
 \subsection{Deep Q-Network Learning}
-We trained our  Deep $Q$-Network for $2000$ episodes, using a discount factor $\gamma=0.9$, $\epsilon$ starting from $1$ to $0.01$ with decay rate of $\Delta=10^4$ and a learning rate $\alpha=10^{-4}$. In addition, we use a replay memory of size $4096$, and a batch $256$. We synchronize the \texttt{policy\_net} and \texttt{target\_net} every $2048$ steps of the agent. The evolution of the training process can be observed in Figure \ref{fig:dqnlog}, it shows the averaged accumulated squared TD-error (MSE Loss) and, reward, and steps.
+We trained our  Deep $Q$-Network for $2000$ episodes, using a discount factor $\gamma=0.9$, $\epsilon$ starting from $1$ to $0.01$ with decay rate of $\Delta=10^4$ and a learning rate $\alpha=10^{-4}$. In addition, we use a replay memory of size $4096$, and a batch $256$. We synchronize the \texttt{policy\_net} and \texttt{target\_net} every $2048$ step of the agent. The evolution of the training process can be observed in Figure \ref{fig:dqnlog}, it shows the averaged accumulated squared TD-error (MSE Loss), reward, and steps.
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\linewidth]{figures/DQNLearning_episode.pdf}
 	\caption{DQN-Learning per episode training metrics}
 	\label{fig:dqnlog}
 \end{figure}
-During the phase were we $\epsilon$ the network give some random value until it starts to find the right policy that he refine. Once $\epsilon$ is small enough, the agent start to exploit and refine the optimal policy found by algorithm. We resume the training and an evaluation phase in Table \ref{tab:summ_dqn}, and the optimal policy is shown in figure \ref{fig:optimal}.
+During the phase where we $\epsilon$ the network gives some random value until it starts to find the right policy that it refine. Once $\epsilon$ is small enough, the agent starts exploiting and refining the optimal policy found by the algorithm. We resume the training and evaluation phase in Table \ref{tab:summ_dqn}, and the optimal policy is shown in Figure \ref{fig:optimal}.
 \begin{table}
 	\centering
 	\begin{tabular}{@{}lrr@{}}
@@ -404,16 +404,16 @@ During the phase were we $\epsilon$ the network give some random value until it 
 \end{table}
 
 
-Now, instead of feeding a vector, we use image as input and we report the results in the next section.
+Now, instead of feeding a vector, we use the image as input and we report the results in the next section.
 \subsection{Deep Q-Network Learning with RGB Image}
-For this approach, we train the Deep Q-convolutional networks for $1500$ episodes, using a discount factor $\gamma=0.9$, $\epsilon$ starting from $1$ to $0.01$ with decay rate of $\Delta=10^4$ and a learning rate $\alpha=10^{-4}$. In addition, we use a replay memory of size $4096$, and a batch $128$. We synchronize the \texttt{policy\_net} and \texttt{target\_net} every $2048$ steps of the agent. The evolution of the training process can be observed in Figure \ref{fig:dqn-img}, it shows the averaged accumulated squared TD-error (MSE Loss) and, reward, and steps.
+For this approach, we train the Deep Q-convolutional networks for $1500$ episodes, using a discount factor $\gamma=0.9$, $\epsilon$ starting from $1$ to $0.01$ with a decay rate of $\Delta=10^4$ and a learning rate $\alpha=10^{-4}$. In addition, we use a replay memory of size $4096$, and a batch $128$. We synchronize the \texttt{policy\_net} and \texttt{target\_net} every $2048$ step of the agent. The evolution of the training process can be observed in Figure \ref{fig:dqn-img}, it shows the averaged accumulated squared TD-error (MSE Loss), reward, and steps.
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\linewidth]{figures/DQNRGBLearning_episode.pdf}
 	\caption{DQN-Learning with RGB Image technique per episode training metrics}
 	\label{fig:dqn-img}
 \end{figure}
-At the begging of the one episodes was slow. Then the duration of one epoch started slowly to decrease and become faster. This is due to the fact that the network/agent does not yet have any idea about the environment so it explore, (reson why we started with a higher value of $\epsilon$). We resume the training and an evaluation phase in Table \ref{tab:summ_dqn}, and the optimal policy is shown in figure \ref{fig:optimal}.
+At the beginning of the one episode was slow. Then the duration of one epoch started slowly to decrease and become faster. This is because the network/agent does not yet have any idea about the environment so it explores, (the reason why we started with a higher value of $\epsilon$). We resume the training and evaluation phase in Table \ref{tab:summ_dqn}, and the optimal policy is shown in Figure \ref{fig:optimal}.
 \begin{table}
 	\centering
 	\begin{tabular}{@{}lrr@{}}
@@ -428,26 +428,26 @@ At the begging of the one episodes was slow. Then the duration of one epoch star
 	\label{tab:summ-dqn-img}
 \end{table}
 
-The two deep learning approach resulted in good performance, especially the DQ-CNN with 11 steps against 12 for the simple DQN.
-However, in terms of speed the simple DQN is faster, and may be with an efficient hyperameters tuning like grid search, we will possibly get same results for both methods.
+The two deep learning approaches resulted in good performance, especially the DQ-CNN with 11 steps against 12 for the simple DQN.
+However, in terms of speed, the simple DQN is faster, and maybe with efficient hyperparameter tuning like grid search, we may get the same results for both methods.
 
 \begin{figure}
 	\centering
 	\begin{tikzpicture}
-	\fill[darkgray!80] (-1,-1) rectangle (7,7);
-	\fill[black!90] (0,0) rectangle (6,6);
-	\fill[green] (5,0) rectangle (6,1);
+		\fill[darkgray!80] (-1,-1) rectangle (7,7);
+		\fill[black!90] (0,0) rectangle (6,6);
+		\fill[green] (5,0) rectangle (6,1);
 
-	\foreach \x in {0, 1, 2, 3, 4, 5} {
-		\draw[gray, line width=1pt] (\x,0) -- (\x,6);
-		\draw[gray, line width=1pt] (0, \x) -- (6,\x);
-	}
-	\draw[dashed, line width=1pt, color=cyan, line cap=round, line width=2pt, rounded corners] (0.5,5.4)--++(1.9,0)--++(0,-5.2)--++(3.1,0);
-	\draw[dashed, line width=1pt, color=orange, line cap=round, line width=2pt, rounded corners] (0.5,5.5)--++(2,0)--++(0,-5.2)--++(3,0);
-	\draw[dashed, line width=1pt, color=blue, line cap=round, line width=2pt, rounded corners] (0.5,5.6)--++(3,0)--++(0,-5.2)--++(2,0);
-	\draw[dashed, line width=1pt, color=yellow, line cap=round, line width=2pt, rounded corners] (0.5,5.7)--++(5,0)--++(0,-5.2);
+		\foreach \x in {0, 1, 2, 3, 4, 5} {
+			\draw[gray, line width=1pt] (\x,0) -- (\x,6);
+			\draw[gray, line width=1pt] (0, \x) -- (6,\x);
+		}
+		\draw[dashed, line width=1pt, color=cyan, line cap=round, line width=2pt, rounded corners] (0.5,5.4)--++(1.9,0)--++(0,-5.2)--++(3.1,0);
+		\draw[dashed, line width=1pt, color=orange, line cap=round, line width=2pt, rounded corners] (0.5,5.5)--++(2,0)--++(0,-5.2)--++(3,0);
+		\draw[dashed, line width=1pt, color=blue, line cap=round, line width=2pt, rounded corners] (0.5,5.6)--++(3,0)--++(0,-5.2)--++(2,0);
+		\draw[dashed, line width=1pt, color=yellow, line cap=round, line width=2pt, rounded corners] (0.5,5.7)--++(5,0)--++(0,-5.2);
 
-	\begin{scope}[yshift=1cm]
+		\begin{scope}[yshift=1cm]
 			\fill[green, scale=0.6, yshift=-1.6cm, xshift=-.2cm] (-1,-2) rectangle (0,-3);
 			\node (t) at (0.5,-2.5) {Target};
 			\fill[red, xshift=0.35cm] (-1,-3.8) -- (-1,-3.2) -- (-.6,-3.5) -- cycle;
@@ -456,18 +456,18 @@ However, in terms of speed the simple DQN is faster, and may be with an efficien
 			\draw[color=orange, line width=2pt, line cap=round,dashed] (1.5,-3.5) --++(0.5,0) node[right, black] {SARSA};
 			\draw[color=blue, line width=2pt, line cap=round,dashed] (4.5,-2.5) --++(0.5,0) node[right, black] {DQN};
 			\draw[color=yellow, line width=2pt, line cap=round,dashed] (4.5,-3.5) --++(0.5,0) node[right, black] {DQN-RGB};
-	\end{scope}
-	\fill[red] (0.2,5.8) -- (0.2,5.2) -- (0.6,5.5) -- cycle;
-\end{tikzpicture}
-\caption{Optimal Policy found by each algorithm}
-\label{fig:optimal}
+		\end{scope}
+		\fill[red] (0.2,5.8) -- (0.2,5.2) -- (0.6,5.5) -- cycle;
+	\end{tikzpicture}
+	\caption{Optimal Policy found by each algorithm}
+	\label{fig:optimal}
 \end{figure}
 \section{Conclusion}
-In conclusion, we have explored four Reinforcement Learning algorithm. Q-Learning and SARSA for Tabular methods in one side and DQN and DQN-CNN for Deep leaning technique for reinforcement Learning in the other side. Each algorithm achieved 100\% completion rate, with an average of 12 steps over 1000 episode for Q-Learning, SARSA, DQN, while the DQN-CNN did 11 steps, even it was a bit slow.
+In conclusion, we have explored four Reinforcement Learning algorithms. Q-Learning and SARSA for Tabular methods on one side and DQN and DQN-CNN for Deep learning techniques for reinforcement Learning on the other side. Each algorithm achieved a 100\% completion rate, with an average of 12 steps over 1000 episodes for Q-Learning, SARSA, and DQN, while the DQN-CNN did 11 steps, even though it was a bit slow.
 
 
 \begin{thebibliography}{1}
-\bibitem{lecture} Prof Herman Engelbrecht, Reinforcement Learning Lecture, Stellenbosch University, 2024.
-\bibitem{book}  Richard S. Sutton, Andrew Barto, Reinforcement Learning: An Introduction.
-\bibitem{minigrid} Farama Foundation, \texttt{minigrid} \href{https://minigrid.farama.org/}{https://minigrid.farama.org/}
+	\bibitem{lecture} Prof Herman Engelbrecht, Reinforcement Learning Lecture, Stellenbosch University, 2024.
+	\bibitem{book}  Richard S. Sutton, Andrew Barto, Reinforcement Learning: An Introduction.
+	\bibitem{minigrid} Farama Foundation, \texttt{minigrid} \href{https://minigrid.farama.org/}{https://minigrid.farama.org/}
 \end{thebibliography}
