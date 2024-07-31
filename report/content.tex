@@ -110,7 +110,7 @@ The tabular method refers to the creation of a table called Q-table, containing 
 
 For the two algorithms that we present in this section, the observation (a $7\times3\times3$ array) will be converted into a string to create an MD5 hash to represent the given state.
 \subsection{SARSA}
-The SARSA algorithm is an on-policy method, which means it iteratively refines a single policy, that also generates control action within the environments. The update rule is defined by:
+The SARSA algorithm is an on-policy method, as it updates $Q$-values based on the action taken by the current policy, defined by :
 \begin{equation}\label{eq:sarsa}
 	Q(S_t, A_t)\leftarrow Q(S_t, A_t) + \alpha[R_{t+1} + \gamma(S_{t+1}, A_{t+1}) - Q(S_t, A_t)]
 \end{equation}
@@ -135,7 +135,7 @@ From the equation \eqref{eq:sarsa}, we obtain the Algorithm \ref{algo:sarsa} for
 \end{algorithm}
 
 \subsection{Q-Learning}
-In contrast to SARSA, the $Q$-Learning algorithm is an off-policy algorithm, which means we optimise the target policy using different policies. The update rule is given by
+In contrast to SARSA, the $Q$-Learning algorithm is an off-policy algorithm, as the $Q$-values is updated based on the maximum possible Q-value of the next state as follow:
 \begin{equation}\label{eq:qlr}
 	Q(S_t, A_t)\leftarrow Q(S_t, A_t) + \alpha[R_{t+1} + \gamma\max_a (S_{t+1}, a) - Q(S_t, A_t)]
 \end{equation}
